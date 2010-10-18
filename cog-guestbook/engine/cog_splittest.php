@@ -2,6 +2,7 @@
 // -------------------------------------------------------
 //  A/B-test extended scriptor module v2.1
 //  dependencies: cog_sql, cog_scriptor
+//  credits for Patio11's A/Bingo, this module is loosely based on his implementation
 // -------------------------------------------------------
 
 // challenge to be displayed only once per page
@@ -176,6 +177,5 @@ class Splittest extends Scriptor {
 		$this->ctrls["abgoal"] = "ctrl_abgoal";  
 	}
 }
-
 
 ?>
