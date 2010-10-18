@@ -1,0 +1,1 @@
+<script type="text/javascript">$.ajax({url: '/cog-guestbook/ab_ishuman', dataType: 'json', data: {"test" : "ishuman"} });</script> 

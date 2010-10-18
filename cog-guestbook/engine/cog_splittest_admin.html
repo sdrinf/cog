@@ -1,0 +1,31 @@
+<cog:iterator datasource="tests">
+<h3>Experiment "<%name%>"</h3>
+<table class="experiment" border="1" >
+  <tr class="header_row">
+    <th>Name</th>
+    <th>Participants</th>
+    <th>Conversions</th>
+  </tr> 
+  <tr class="experiment_row">
+    <td>Total: </td> 
+	<td><%dcount%> </td>
+	<td><%conversion_total%> ( <%conversion_ctr%>% )</td>
+  </tr>
+  <tr class="alternative_row">
+	<td><a href="http://<%domain%>/ab_set?name=<%name%>&value=control">Control group</a></td>
+	<td><%sample_control%></td>
+	<td><%cr_control%> ( <%ctrc%>% )</td> 
+  </tr>
+  <tr>
+	<td><a href="http://<%domain%>/ab_set?name=<%name%>&value=experiment">Experiment group</a></td> 
+	<td><%sample_exp%></td>
+	<td><%cr_exp%> ( <%ctre%>% )</td>   
+  </tr>
+  <tr>
+    <td colspan="3">  
+	<b>Significance test results: </b><%descr%>
+	</td>
+  </tr> 
+</table>
+</cog:iterator>
+
