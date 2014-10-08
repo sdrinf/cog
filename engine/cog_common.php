@@ -35,11 +35,30 @@ function endsWith( $str, $sub ) {
 }
 
 // updates the variables in r from src, similiar to python's update function
-function update($r, $src) {
-	foreach ($src as $k=>$v) {
-		$r[$k] = $v;
+// optionally updates specific fields only
+function update($r, $src, $fields = null) {
+	if ($fields == null) {
+		$fields = array_keys($src);
+	}
+	foreach ($fields as $k) {
+		$r[$k] = $src[$k];
 	}
 	return $r;
+}
+
+
+// creates an array indexed by $str
+function indexby($str, $arr, $isunique = false) {
+	$res = [];
+	foreach ($arr as $k) {
+		if ($isunique)
+			$res[$k[$str]] = $k;
+		else if (!isset($res[$k[$str]]))
+			$res[$k[$str]] = [$k];
+		else
+			$res[$k[$str]] []= $k;
+	}
+	return $res;
 }
 
 // -------------------------------------------------------
@@ -47,6 +66,7 @@ function update($r, $src) {
 // -------------------------------------------------------
 function redirect($url) {
 	header("Location: ".$url);
+	return null;
 }
 
 ?>

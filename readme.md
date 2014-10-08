@@ -39,19 +39,19 @@ This script sets up the <a href="#332">webhandler</a>, by giving a list of URL-p
 $wapp = new WebHandler(
 	array(				// URL handlers
 		// main pages
-		"/" =&gt; "site_app/splash.php",
-		"/signout" =&gt; "site_app/signout.php",
-		"/dashboard" =&gt; "site_app/dashboard.php"
-		"/(.*)" =&gt; "site_app/notfound.php",
+		"/" => "site_app/splash.php",
+		"/signout" => "site_app/signout.php",
+		"/dashboard" => "site_app/dashboard.php"
+		"/(.*)" => "site_app/notfound.php",
 		),
 	array(				// frame parameters
-		"title" =&gt; "My e-mail app",
-		"description" =&gt; "This is an e-mail application",
-		"keywords" =&gt; "e-mail",
+		"title" => "My e-mail app",
+		"description" => "This is an e-mail application",
+		"keywords" => "e-mail",
 		),
 		"site_app/frame.html" // frame page
 	);
-echo $wapp-&gt;result();
+echo $wapp->result();
 exit;
 ```
 
@@ -66,7 +66,7 @@ A URL handler can either be a lambda function directly in the main.php, or an in
 ```php
 function child_render($param) {
 	$scr = new Scriptor("site_app/dashboard.html");
-	return $scr-&gt;result();
+	return $scr->result();
 }
 ```
 
@@ -82,25 +82,25 @@ Typically, each URL handler has a corresponding .html file containing the page t
 <a href="#330">Scriptor </a>takes a template file's name, and an array of data to fill it with, and returns an HTML output for display.
 The template files are regular .html snippets, with two extensions:
 
--&lt;%<i>varname</i>%&gt; tags are substituted with the corresponding variable in the data parameter
--Scriptor implements a number of controls for data iteration, validation, forms, and conditional display; these are  embedded via the &lt;cog:<i>controlname</i>&gt; tags.
+-<%<i>varname</i>%> tags are substituted with the corresponding variable in the data parameter
+-Scriptor implements a number of controls for data iteration, validation, forms, and conditional display; these are  embedded via the <cog:<i>controlname</i>> tags.
 
 
 <b>Database reading:</b>
 All select operation are handled through the gettable function of <a href="#327">cog's database module</a>; which allows simple parametrized SQL-safe queries. For example:
 ```php
 $q = gettable("<i>select * from users where password = md5(@pwd) and username = @username</i>",
-array("pwd" =&gt; $_POST["pwd"], "username" =&gt; $_POST["username"] );
+array("pwd" => $_POST["pwd"], "username" => $_POST["username"] );
 ```
 
 Which returns an array of hashtables, like this:
 ```Array
 (
-    [0] =&gt; Array
+    [0] => Array
         (
-            [id] =&gt; 1
-            [username] =&gt; admin
-            [password] =&gt; 0192023a7bbd73250516f069df18b500
+            [id] => 1
+            [username] => admin
+            [password] => 0192023a7bbd73250516f069df18b500
         )
 )
 ```
@@ -115,21 +115,21 @@ The handler:
 ```php
 function child_render($param) {
 	$q = gettable("select * from users");
-	$scr = new Scriptor("site_app/dashboard.html", array("users" =&gt; $q));
-	return $scr-&gt;result();
+	$scr = new Scriptor("site_app/dashboard.html", array("users" => $q));
+	return $scr->result();
 }
 ```
 And the front-end:
 ```html
-&lt;b&gt;Admin dashboard&lt;/b&gt;&lt;br /&gt;
-&lt;table border="1"&gt;
-&lt;thead&gt;&lt;tr&gt;&lt;td&gt;Username&lt;/td&gt;&lt;td&gt;Is admin&lt;/td&gt;&lt;/tr&gt;&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;cog:iterator datasource="users"&gt;
-&lt;tr&gt;&lt;td&gt;&lt;%username%&gt;&lt;/td&gt;&lt;td&gt;&lt;%isadmin%&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;/cog:iterator&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+<b>Admin dashboard</b><br />
+<table border="1">
+<thead><tr><td>Username</td><td>Is admin</td></tr></thead>
+<tbody>
+<cog:iterator datasource="users">
+<tr><td><%username%></td><td><%isadmin%></td></tr>
+</cog:iterator>
+</tbody>
+</table>
 ```
 
 The iterator control (cog:iterator) goes through every single line in the returned DB row, and updates the variable hashtable with the row's contents.
@@ -139,12 +139,12 @@ Variables with the same name will be overwritten within the iterator, but will b
 Post requests are always made to the same URL handler as get ones, but instead of calling child_render, it's passed through the corresponding event handler function:
 
 ```php
-$g_pageforms = array("test" =&gt; "test_onsubmit" );
+$g_pageforms = array("test" => "test_onsubmit" );
 
 function test_onsubmit($param, $post) {
 	$scr = new Scriptor("site/test.html", array() );
-	if (!$scr-&gt;validate("test", $post))  {
-		return $scr-&gt;result();
+	if (!$scr->validate("test", $post))  {
+		return $scr->result();
 	}
 	return "validation passed!";
 }
@@ -152,16 +152,16 @@ function test_onsubmit($param, $post) {
 
 Post handler takes a list of URL request parameters, and a list of post parameters.
 
-On the front-end, forms are using the &lt;cog:form&gt; control, which generates a cross-site scripting (XSS) safe form. The name parameter is used for demuxing between mulitple forms on the same page via the $g_pageforms variable:
+On the front-end, forms are using the <cog:form> control, which generates a cross-site scripting (XSS) safe form. The name parameter is used for demuxing between mulitple forms on the same page via the $g_pageforms variable:
 
 ```html
-&lt;cog:form name="test" method="post"&gt;
-Year of birth: &lt;input type="text" name="dob" /&gt;&lt;Br /&gt;
-&lt;cog:validator func="numberonly" target="dob" &gt;
-	Please enter the year you were born.&lt;br /&gt;
-&lt;/cog:validator&gt;
-&lt;input type="submit" name="send" /&gt;
-&lt;/cog:form&gt;
+<cog:form name="test" method="post">
+Year of birth: <input type="text" name="dob" /><Br />
+<cog:validator func="numberonly" target="dob" >
+	Please enter the year you were born.<br />
+</cog:validator>
+<input type="submit" name="send" />
+</cog:form>
 ```
 
 <b>Validation</b>
@@ -197,11 +197,11 @@ function child_render($param) {
 	}
 
 	$export_func = array(
-		"delete_user" =&gt; array(
+		"delete_user" => array(
 				array("uid"), // list of required parameters
 				function($uid) {
-					dbcommit("delete from ops_users where id = @uid", array("uid" =&gt; $uid));
-					return array("ok" =&gt; "ok");
+					dbcommit("delete from ops_users where id = @uid", array("uid" => $uid));
+					return array("ok" => "ok");
 				}
 		),
 	);
@@ -214,7 +214,7 @@ function child_render($param) {
 Front-end:
 
 ```html
-&lt;script type="text/javascript"&gt;
+<script type="text/javascript">
 function delete_user(id) {
 	var ck = confirm("Delete user: Are you sure?");
 	if (ck != true)
@@ -227,7 +227,7 @@ function delete_user(id) {
 	});
 	return false;
 }
-&lt;/script&gt;
+</script>
 ```
 
 (Notice, that authentication takes place before AJAX handling; in this case, access authentication is specific to the whole URL, so no need to duplicate that functionality)
@@ -289,15 +289,15 @@ Debug Msg
 
 ERROR: internal error: can not execute: select * from non_existing_table
 
-MySQL error: Table 'mindverse.cards.non_existing_table' doesn't exist
+MySQL error: Table 'guestbook.non_existing_table' doesn't exist
 in errorhandler on line 0
 Trace:
-in class WebHandler::result() called by /www/custlabs.com/custlabs.php, line 165
+in class WebHandler::result() called by /www/guestbook/guestbook.php, line 165
 ....
 in function errorHandler(1, "internal error: can not execute:
 select * from non_existing_table
 MySQL error: Table 'mindverse.cards.non_existing_table' doesn't exist",
- "errorhandler", 0, 0) called by /www/custlabs.com/engine/cog_errorhandler.php, line 180
+ "errorhandler", 0, 0) called by /www/guestbook/engine/cog_errorhandler.php, line 180
 ```
 
 In deployment mode, a generic error message is displayed to the user, and detailed stack info, along with the error message is sent to the admin's e-mail address, as stored in $g_cfg["adminmail"] .
@@ -340,7 +340,7 @@ Returns true on success; uses the errorhandler to raise an error on query execut
 Inserts a new row into given table, with given fields. Parameters supplied via the $funcs array are executed directly, which is useful for mysql function calls (eg. now() ).
 Returns the newly inserted row's ID on success.
 
-<b>bool dbupdate(string $table, array $fields, array $where = array(1=&gt;0), array $funcs = null)</b>
+<b>bool dbupdate(string $table, array $fields, array $where = array(1=>0), array $funcs = null)</b>
 Updates the given table with the contents of $fields array for rows matching the $where array.
 
 
@@ -368,18 +368,18 @@ Inserts new data, and updates the resulting HTML snippet.
 
 
 
-Other than substituding each &lt;%data%&gt; with it's respective value, Scriptor also features the following special tags:
+Other than substituding each <%data%> with it's respective value, Scriptor also features the following special tags:
 
-<b>&lt;cog:if name="varname" value="varvalue"&gt; </b>
+<b><cog:if name="varname" value="varvalue"> </b>
 The content will be rendered, if <i>varname</i> exists in the datalist, and it's value equals to <i>varvalue</i>.
 
-<b>&lt;cog:iterator datasource="source"&gt; </b>
+<b><cog:iterator datasource="source"> </b>
 Iterates through an array given as <i>source</i>, and for each element, renders the content, substituding variables within the array.
 
-<b>&lt;cog:form name="myform" action="" method="post"&gt; </b>
+<b><cog:form name="myform" action="" method="post"> </b>
 Generates a cross-site scripting (<a href="http://en.wikipedia.org/wiki/Cross-site_scripting">XSS</a>) safe, validatable form.
 
-<b>&lt;cog:validator func="func" target="name"&gt; </b>
+<b><cog:validator func="func" target="name"> </b>
 Validates <i>name</i> posted parameter by passing it into validator_<i>func</i>, and checking return value; content of the tag is rendered, if validation fails.
 
 
@@ -388,7 +388,7 @@ New controls can be dynamically added by simply declaring a function with ctrl_ 
 ```php
 // includes a file, and passes it back to Scriptor for evaluation
 function ctrl_file($scr, $param, $script, $vals) {
-	return $scr-&gt;ev(file_get_contents($param["name"]), $vals);
+	return $scr->ev(file_get_contents($param["name"]), $vals);
 }
 ```
 
@@ -405,13 +405,13 @@ The difference between A/B testing, and Multivariant testing is the number of te
 <b>Setting up test variants</b>
 Cog achieves Multivariant testing via two Scriptor extension. Including cog_multivariant.php, enables you to simply update your front-end, eg:
 ```html
-&lt;cog:variant name="call_to_action" value="try" &gt;
+<cog:variant name="call_to_action" value="try" >
  Try it now! 30 day money-back guarantee
-&lt;cog:variant&gt;
+<cog:variant>
 
-&lt;cog:variant name="call_to_action" value="buy" &gt;
+<cog:variant name="call_to_action" value="buy" >
  Buy now! Limited trial, only $2.99
-&lt;cog:variant&gt;
+<cog:variant>
 ```
 
 The Multivariant extension automagically sets up the relevant test rows in the database, and assigns users (based on session) to a randomly chosen test. Once assigned, users will consistently be displayed the same test variant as long as session is maintained.
@@ -455,7 +455,7 @@ Cog is available for download via Git:
 
 ```
 git init
-&gt; git pull https://github.com/sdrinf/cog.git
+> git pull https://github.com/sdrinf/cog.git
 ```
 
 <b>Patches / bugfixes / etc</b>

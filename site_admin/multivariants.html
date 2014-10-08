@@ -1,0 +1,40 @@
+<script type="text/javascript" src="/static/libs/tablesorter/jquery.tablesorter.min.js"></script>
+<link rel="stylesheet" href="/static/libs/tablesorter/style.css" type="text/css" media="print, projection, screen" />
+
+
+<h1>Variants under test:</h1>
+<br/><br/>
+<table cellspacing="1" class="tablesorter" style="width:600px">
+	<thead>
+		<tr style="border-bottom: 1px solid #000000"><td>Test</td><td></td><td></td><td></td></tr>
+	</thead>
+	<tbody>
+		<cog:iterator datasource="tests">
+			<tr>
+				<td valign="top"><%test%><br />
+					<hr size="1" />
+					<!--
+					Winnter: <%shortwinner%><br />
+					Confidence level: <%confidence%><br /> -->
+					<a href="/stats/multivariants/switch_status?name=<%test%>&p=close">[Close test]</a>
+
+				</td>
+				<cog:iterator datasource="var">
+					<td valign="top" style="width:150px;"><%content%><Br /><Br />
+						<cog:iterator datasource="goals">
+							<%goal%>: <%pc%>% (<%conversion%> / <%sample%>)<br />
+						</cog:iterator>
+						<cog:if name="enrolled" value="1">[Current]</cog:if>
+						<cog:if name="enrolled" value="0"><a href="/user_api?func=variant_set&name=<%test%>&var=<%variation%>" target="_blank">[enroll]</a></cog:if>
+					</td>
+				</cog:iterator>
+			</tr>
+		</cog:iterator>
+	</tbody>
+</table>
+
+<script type="text/javascript">
+$(function() {
+	$("table").tablesorter({widthFixed: true });
+});
+</script>

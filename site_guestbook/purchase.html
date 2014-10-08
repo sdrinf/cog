@@ -1,0 +1,14 @@
+<h1>Very simple guestbook</h1>
+Thank you for your interest in
+<cog:variant name="purchasetest" value="buying">buying</cog:variant>
+<cog:variant name="purchasetest" value="purchasing">purchasing</cog:variant>
+<cog:variant name="purchasetest" value="getting">getting</cog:variant>
+simple guestbook.<Br />
+
+We're currently working diligently to make sure the service is secure, and failsafe. If you wish to receive notification "when it's done", please enter your e-mail address:
+<br /> <br />
+<cog:form action="/purchase" name="emailsubscribe" method="post">
+<input type="text" name="email" value="" /><input type="submit" value="Subscribe" />
+<cog:validator func="email" target="email" ><br />Please enter a valid e-mail address</cog:validator>
+</cog:form>
+</div>
